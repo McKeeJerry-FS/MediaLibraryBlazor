@@ -49,5 +49,33 @@ namespace MediaLibrary.Server.Services
             var entity = await GetEntityByIdAsync(id);
             return _mapper.Map<TModel>(entity);
         }
+
+        // Reading All Records
+        public async Task<IEnumerable<TModel>> GetAllAsync()
+        {
+            var entities = await _dbContext
+                .Set<TEntity>()
+                .AsNoTracking()
+                .ToListAsync();
+            return entities.Select(x => _mapper.Map<TModel>(x));
+        }
+
+        // Updating Records
+        public async Task<TModel> UpdateAsync(TModel model, int id)
+        {
+            var entity = await GetEntityByIdAsync(id);
+            _mapper.Map<TModel, TEntity>(model, entity);
+            await _dbContext.SaveChangesAsync();
+            return _mapper.Map<TModel>(entity);
+        }
+
+        // Deleting Record
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await GetEntityByIdAsync(id);
+            _dbContext.Set<TEntity>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
 }
